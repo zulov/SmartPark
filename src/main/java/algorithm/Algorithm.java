@@ -23,20 +23,23 @@ public class Algorithm {
     private DocumentRepository documentRepository;
     Map<Long, DijkstraNode> dijkstraNodes;
     ArrayList<CordNode> cordNodes;
-
+    List<AbstractEntity> distances;
     private Dijkstra dijkstra;
 
     public Algorithm() throws IOException {
         dijkstraNodes = new HashMap<>(40000);
-        cordNodes = new ArrayList<>(40000);
-
     }
 
 
     public ResponseList find(String startLat, String startLon, String endLat, String endLon, double threshhold) throws IOException {
         long startTime = System.currentTimeMillis();
-        cordNodes.clear();
-        cordNodes.addAll(documentRepository.getAll("CordNode").stream().map(ab -> (CordNode) ab).collect(Collectors.toList()));
+        if (cordNodes == null) {
+            cordNodes = new ArrayList<>(40000);
+            cordNodes.addAll(documentRepository.getAll("CordNode").stream().map(ab -> (CordNode) ab).collect(Collectors.toList()));
+        }
+        if (distances == null) {
+            distances = documentRepository.getAll("Distances");
+        }
 
         dijkstra = new Dijkstra();
         Long start = find(startLat, startLon);
@@ -69,8 +72,8 @@ public class Algorithm {
 
     private List<CordNode> createPath(ArrayList<Long> pathIds) {
         List<CordNode> path = new ArrayList<>(pathIds.size());
-        List<CordNode> path_db=documentRepository.findIds(pathIds);
-        Map<Long, CordNode> map = path_db.stream().collect(Collectors.toMap(CordNode::getCid ,item -> item));
+        List<CordNode> path_db = documentRepository.findIds(pathIds);
+        Map<Long, CordNode> map = path_db.stream().collect(Collectors.toMap(CordNode::getCid, item -> item));
         for (int i = pathIds.size() - 1; i >= 0; i--) {
 
             CordNode tn = map.get(pathIds.get(i));
@@ -81,8 +84,8 @@ public class Algorithm {
 
     private void prepareDikstraNodes() throws IOException {
         dijkstraNodes.clear();
-        List<AbstractEntity> entities = documentRepository.getAll("Distances");
-        for (AbstractEntity entity : entities) {
+
+        for (AbstractEntity entity : distances) {
             Distances distances = (Distances) entity;
             if (!dijkstraNodes.containsKey(distances.getStartNode().getCid())) {
                 dijkstraNodes.put(distances.getStartNode().getCid(), new DijkstraNode(0, distances.getStartNode().getCid()));

@@ -32,7 +32,7 @@ public class DocumentRepository {
         em.persist(entity);
     }
 
-    public List<AbstractEntity> getAll(String name) throws IOException {
+    public List<AbstractEntity> getAll(String name) {
         Query query = em.createQuery("FROM "+name, AbstractEntity.class);
         List<AbstractEntity> entities = query.getResultList();
         return entities;
