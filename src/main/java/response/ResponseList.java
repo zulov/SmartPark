@@ -1,7 +1,9 @@
 package response;
 
-import entities.Document;
+import entities.AbstractEntity;
+import entities.CordNode;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -9,16 +11,16 @@ import java.util.List;
  */
 public class ResponseList {
     int hits;
+    int distance;
     Long time;
-    List<Document> documents;
+    List<CordNode>entities;
 
-
-    public List<Document> getDocuments() {
-        return documents;
+    public List<CordNode> getEntities() {
+        return entities;
     }
 
-    public void setDocuments(List<Document> documents) {
-        this.documents = documents;
+    public void setEntities(List<CordNode> entities) {
+        this.entities = entities;
     }
 
     public int getHits() {
@@ -35,5 +37,13 @@ public class ResponseList {
 
     public void setTime(Long time) {
         this.time = time;
+    }
+
+    public int getDistance() {
+        return distance;
+    }
+
+    public void setDistance(int distance) {
+        this.distance = distance;
     }
 }

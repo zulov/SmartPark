@@ -7,4 +7,5 @@ import java.io.Serializable;
 @Entity
 @Table(name = "traffic_sensor")
 public class TrafficSensor    extends AbstractEntity {
+
 }

@@ -4,8 +4,8 @@ package repositories;
  * Created by Tomek on 2015-11-15.
  */
 
-import entities.Document;
-
+import entities.AbstractEntity;
+import entities.CordNode;
 import response.ResponseList;
 
 import javax.ejb.LocalBean;
@@ -28,46 +28,33 @@ public class DocumentRepository {
     private EntityManager em;
 
     @TransactionAttribute(TransactionAttributeType.REQUIRED)
-    public void savePs(Document document) {
-        em.persist(document);
+    public void save(AbstractEntity entity) {
+        em.persist(entity);
     }
 
+    public List<AbstractEntity> getAll(String name) throws IOException {
+        Query query = em.createQuery("FROM "+name, AbstractEntity.class);
+        List<AbstractEntity> entities = query.getResultList();
+        return entities;
+    }
+    public CordNode getCordNode (Integer id){
 
+        Query query = em.createQuery("FROM CordNode d where d.cid=:id", CordNode.class);
+        query.setParameter("id",id);
+        long startTime = System.currentTimeMillis();
+        CordNode  entity=(CordNode) query.getSingleResult();
+        long endTime = System.currentTimeMillis();
+        System.out.println(endTime-startTime);
+        return entity;
 
-    public List<Document> listAllPostgres() {
-        Query query = em.createNamedQuery("Post.all");
-        return (List<Document>) query.getResultList();
     }
 
-    public void addToPS(Document document) {
-        em.persist(document);
-    }
+    public AbstractEntity get(String entityName, String field,String value) {
+        Query query = em.createQuery("FROM " + entityName + " d where d."+field+"="+value, AbstractEntity.class);
 
+        AbstractEntity  entity= (AbstractEntity) query.getSingleResult();
 
-    public ResponseList findPs(String text,String field) throws IOException {
-        long millisStart = Calendar.getInstance().getTimeInMillis();
-
-        Query query = em.createNativeQuery("SELECT * FROM document d where d."+field+" like '"+text+"'",Document.class);
-        List<Document> documents=query.getResultList();
-
-        long millisEnd = Calendar.getInstance().getTimeInMillis();
-        ResponseList rl= new ResponseList();
-        rl.setHits(documents.size());
-        rl.setDocuments(documents);
-        rl.setTime(millisEnd-millisStart);
-        return rl;
-    }
-
-    public ResponseList findPs(List<Integer> ids) {
-        Query query = em.createQuery("FROM Document d where d.id in (:ids)");
-        query.setParameter("ids",ids);
-        List<Document> documents=query.getResultList();
-
-        ResponseList rl= new ResponseList();
-        rl.setHits(documents.size());
-        rl.setDocuments(documents);
-
-        return rl;
+        return entity;
     }
 
 }

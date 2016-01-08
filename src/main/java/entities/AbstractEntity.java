@@ -16,6 +16,23 @@ public class AbstractEntity  implements Serializable {
     @Column(name = "timestamp")
     private Timestamp timestamp;
 
+    @Column(name = "activity")
+    private Boolean activity;
+
+    public Boolean getActivity() {
+        return activity;
+    }
+
+    public void setActivity(Boolean activity) {
+        this.activity = activity;
+    }
+
+    public AbstractEntity() {
+        java.util.Date date= new java.util.Date();
+        timestamp=new Timestamp(date.getTime());
+        activity=true;
+    }
+
     public int getId() {
         return id;
     }
