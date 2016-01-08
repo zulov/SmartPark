@@ -3,12 +3,11 @@ package algorithm;
 import entities.AbstractEntity;
 import entities.CordNode;
 import entities.Distances;
-import entities.Way;
-import org.codehaus.jackson.map.ObjectMapper;
 import repositories.DocumentRepository;
 import response.ResponseList;
 
-import javax.ejb.Stateless;
+import javax.ejb.Singleton;
+
 import javax.inject.Inject;
 import java.io.*;
 import java.util.*;
@@ -18,51 +17,65 @@ import java.util.stream.Collectors;
 /**
  * Created by Tomek on 2015-12-14.
  */
-@Stateless
-//@LocalBean
-//@Singleton
+@Singleton
 public class Algorithm {
     @Inject
     private DocumentRepository documentRepository;
-    Map<Integer, DijkstraNode> dijkstraNodes;
+    Map<Long, DijkstraNode> dijkstraNodes;
     ArrayList<CordNode> cordNodes;
 
     private Dijkstra dijkstra;
 
     public Algorithm() throws IOException {
-        dijkstraNodes = new HashMap<>(10000);
-        cordNodes = new ArrayList<>();
+        dijkstraNodes = new HashMap<>(40000);
+        cordNodes = new ArrayList<>(40000);
 
-        dijkstra = new Dijkstra();
     }
 
-    public ResponseList find(String startLat, String startLon, String endLat, String endLon) throws IOException {
+
+    public ResponseList find(String startLat, String startLon, String endLat, String endLon, double threshhold) throws IOException {
         long startTime = System.currentTimeMillis();
+        cordNodes.clear();
         cordNodes.addAll(documentRepository.getAll("CordNode").stream().map(ab -> (CordNode) ab).collect(Collectors.toList()));
 
-        int start = find(startLat, startLon);
-        int end = find(endLat, endLon);
+        dijkstra = new Dijkstra();
+        Long start = find(startLat, startLon);
+        Long end = find(endLat, endLon);
 
-        ArrayList<CordNode> path = findPath(start, end);
+        List<CordNode> path = findPath(start, end, threshhold);
+        Integer distance = dijkstra.getDistance(dijkstraNodes, end);
         long endTime = System.currentTimeMillis();
         ResponseList rl = new ResponseList();
         rl.setEntities(path);
         rl.setTime(endTime - startTime);
         rl.setHits(path.size());
-        //rl.setDistance();
+        rl.setDistance(distance);
         return rl;
     }
 
-    private int find(String lat, String lot) {
+    private Long find(String lat, String lot) {
         return getClosest(lat, lot);
     }
 
-    private ArrayList<CordNode> findPath(int start, int end) throws IOException {
+    private List<CordNode> findPath(Long start, Long end, double threshhold) throws IOException {
         prepareDikstraNodes();
-        dijkstra.setDocumentRepository(documentRepository);
+        dijkstra.setThreshold(threshhold);
         dijkstra.find(dijkstraNodes, start);
 
-        ArrayList<CordNode> path = dijkstra.showPath(dijkstraNodes, end);
+        List<CordNode> path = createPath(dijkstra.showPath(dijkstraNodes, end));
+
+        return path;
+    }
+
+    private List<CordNode> createPath(ArrayList<Long> pathIds) {
+        List<CordNode> path = new ArrayList<>(pathIds.size());
+        List<CordNode> path_db=documentRepository.findIds(pathIds);
+        Map<Long, CordNode> map = path_db.stream().collect(Collectors.toMap(CordNode::getCid ,item -> item));
+        for (int i = pathIds.size() - 1; i >= 0; i--) {
+
+            CordNode tn = map.get(pathIds.get(i));
+            path.add(tn);
+        }
         return path;
     }
 
@@ -82,27 +95,23 @@ public class Algorithm {
         }
     }
 
-    private int getClosest(String _Lat, String _Lon) {
+    private Long getClosest(String _Lat, String _Lon) {
         double lat = Double.parseDouble(_Lat);
         double lon = Double.parseDouble(_Lon);
 
-        CordNode baseNode = new CordNode(1, lat, lon);
+        CordNode baseNode = new CordNode(1L, lat, lon);
 
         double min_odl = cordNodes.get(0).minus(baseNode);
-        int min_id = cordNodes.get(0).getCid();
-
-        for (int i = 1; i < cordNodes.size(); i++) {
-            double temp_odl = cordNodes.get(i).minus(baseNode);
-            if (temp_odl == 0) {
-                return cordNodes.get(i).getCid();
-            }
+        CordNode closest = cordNodes.get(0);
+        for (CordNode cordNode : cordNodes) {
+            double temp_odl = cordNode.minus(baseNode);
             if (min_odl > temp_odl) {
-                min_id = i;
+                closest = cordNode;
                 min_odl = temp_odl;
             }
         }
         System.out.println(min_odl + "--");
-        return cordNodes.get(min_id).getCid();
+        return closest.getCid();
     }
 
 

@@ -37,7 +37,7 @@ public class DocumentRepository {
         List<AbstractEntity> entities = query.getResultList();
         return entities;
     }
-    public CordNode getCordNode (Integer id){
+    public CordNode getCordNode (Long id){
 
         Query query = em.createQuery("FROM CordNode d where d.cid=:id", CordNode.class);
         query.setParameter("id",id);
@@ -56,5 +56,11 @@ public class DocumentRepository {
 
         return entity;
     }
+    public List<CordNode> findIds(List<Long> ids) {
+        Query query = em.createQuery("FROM CordNode d where d.cid in (:ids)");
+        query.setParameter("ids",ids);
+        List<CordNode> documents=query.getResultList();
 
+        return documents;
+    }
 }

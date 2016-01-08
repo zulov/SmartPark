@@ -8,6 +8,7 @@ import java.io.Serializable;
 public class Request implements Serializable{
 
     private Long userId;
+    private double threshold;
     private String startLat;
     private String startLon;
     private String endLat;
@@ -15,6 +16,14 @@ public class Request implements Serializable{
 
     public Long getUserId() {
         return userId;
+    }
+
+    public double getThreshold() {
+        return threshold;
+    }
+
+    public void setThreshold(double threshold) {
+        this.threshold = threshold;
     }
 
     public void setUserId(Long userId) {

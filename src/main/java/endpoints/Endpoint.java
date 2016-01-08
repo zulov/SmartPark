@@ -29,7 +29,7 @@ public class Endpoint {
     @Consumes("application/json")
     @Produces("application/json")
     public Response add(Request request) throws IOException {
-        ResponseList rl = algorithm.find(request.getStartLat(), request.getStartLon(), request.getEndLat(), request.getEndLon());
+        ResponseList rl = algorithm.find(request.getStartLat(), request.getStartLon(), request.getEndLat(), request.getEndLon(),request.getThreshold());
 
         return Response.status(200).entity(rl).build();
     }

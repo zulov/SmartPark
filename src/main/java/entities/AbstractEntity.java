@@ -13,8 +13,8 @@ public class AbstractEntity  implements Serializable {
     @Column(name = "id")
     private int id;
 
-    @Column(name = "timestamp")
-    private Timestamp timestamp;
+    //@Column(name = "timestamp")
+    //private Timestamp timestamp;
 
     @Column(name = "activity")
     private Boolean activity;
@@ -29,7 +29,7 @@ public class AbstractEntity  implements Serializable {
 
     public AbstractEntity() {
         java.util.Date date= new java.util.Date();
-        timestamp=new Timestamp(date.getTime());
+        //timestamp=new Timestamp(date.getTime());
         activity=true;
     }
 
@@ -41,11 +41,5 @@ public class AbstractEntity  implements Serializable {
         this.id = id;
     }
 
-    public Timestamp getTimestamp() {
-        return timestamp;
-    }
 
-    public void setTimestamp(Timestamp timestamp) {
-        this.timestamp = timestamp;
-    }
 }

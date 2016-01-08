@@ -14,12 +14,12 @@ import java.util.ArrayList;
 
 @Entity
 @Table(name = "cord_node",
-        indexes = {
-        @Index(columnList = "cid", name = "cid_inx1")}
+        uniqueConstraints={
+        @UniqueConstraint(columnNames={"cid"})}
 )
 public class CordNode extends AbstractEntity {
     @Column(name="cid")
-    int cid;
+    Long cid;
     @Column(name="lat")
     double lat;
     @Column(name="lon")
@@ -44,15 +44,15 @@ public class CordNode extends AbstractEntity {
         this.lon = lon;
     }
 
-    public int getCid() {
+    public Long getCid() {
         return cid;
     }
 
-    public void setCid(int id) {
-        this.cid = id;
+    public void setCid(Long cid) {
+        this.cid = cid;
     }
 
-    public CordNode(int a, double x, double y) {
+    public CordNode(Long a, double x, double y) {
         cid = a;
         lon = y;
         lat = x;
@@ -82,7 +82,7 @@ public class CordNode extends AbstractEntity {
                 ip = isr + 1;
             }
         }
-        return new CordNode(0, 0, 0);
+        return new CordNode(0L, 0, 0);
     }
 
 }

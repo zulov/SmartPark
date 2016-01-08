@@ -6,18 +6,18 @@ import java.util.List;
 
 public class DijkstraNode {
 
-    int id;
+    Long id;
     int distanceTo;//dlougosc drogi do
     int droga;
 
-    Integer previous;
+    Long previous;
     List<DijkstraNode> neightbours;
 
-    public int getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -37,15 +37,11 @@ public class DijkstraNode {
         this.droga = droga;
     }
 
-    public int getPrevious() {
+    public Long getPrevious() {
         return previous;
     }
 
-    public void setPrevious(int previous) {
-        this.previous = previous;
-    }
-
-    public void setPrevious(Integer previous) {
+    public void setPrevious(Long previous) {
         this.previous = previous;
     }
 
@@ -57,17 +53,17 @@ public class DijkstraNode {
         this.neightbours = neightbours;
     }
 
-    DijkstraNode(int dist, int id) {
+    DijkstraNode(int dist, Long id) {
         distanceTo = dist;
         neightbours = new ArrayList<>();
         this.id = id;
         droga = 200000000;
-        previous = -1;
+        previous = -1L;
     }
 
     DijkstraNode() {
         neightbours = new ArrayList<>();
         droga = 200000000;
-        previous = -1;
+        previous = -1L;
     }
 }
