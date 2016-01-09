@@ -23,6 +23,9 @@ public class PersonalData    extends AbstractEntity {
     @JoinColumn(name="user_id")
     private User user;
 
+    public PersonalData() {
+    }
+
     public PersonalData(String firstname, String lastname, Date birthDate, String cellphone, User user) {
         super();
         this.firstname = firstname;

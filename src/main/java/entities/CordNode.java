@@ -14,8 +14,8 @@ import static java.lang.Math.sqrt;
 
 @Entity
 @Table(name = "cord_node",
-        uniqueConstraints={
-        @UniqueConstraint(columnNames={"cid"})}
+        indexes={
+        @Index(columnList = "cid", name="cn_cid_inx")}
 )
 public class CordNode extends AbstractEntity {
     @Column(name="cid")

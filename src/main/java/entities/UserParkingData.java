@@ -23,4 +23,35 @@ public class UserParkingData   extends AbstractEntity{
     @JoinColumn(name="parking_id")
     private Parking parking;
 
+    public Timestamp getParkTime() {
+        return parkTime;
+    }
+
+    public void setParkTime(Timestamp parkTime) {
+        this.parkTime = parkTime;
+    }
+
+    public Long getDuration() {
+        return duration;
+    }
+
+    public void setDuration(Long duration) {
+        this.duration = duration;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public Parking getParking() {
+        return parking;
+    }
+
+    public void setParking(Parking parking) {
+        this.parking = parking;
+    }
 }

@@ -1,7 +1,13 @@
 package algorithm;
 
+import entities.AbstractEntity;
+import entities.CordNode;
+import entities.Parking;
+import entities.User;
+
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 
@@ -19,11 +25,11 @@ public class Dijkstra {
     }
 
     private Double threshold;
+    private final DistanceUtils distanceUtils = new DistanceUtils();
 
-
-    void find(Map<Long, DijkstraNode> dijkstraNodes, Long start) {
+    void calculate(Map<Long, DijkstraNode> dijkstraNodes, Long start) {
         LinkedList<QueueElement> queue = new LinkedList<>();
-        dijkstraNodes.get(start).setDroga(0);
+        dijkstraNodes.get(start).setTotalDistance(0);
         QueueElement queueElement = createQueueElement(dijkstraNodes.get(start).getId(), 0);
         queue.add(queueElement);
 
@@ -33,10 +39,10 @@ public class Dijkstra {
             queue.removeLast();
             for (DijkstraNode neighbour : temp.getNeightbours()) {
                 DijkstraNode next = dijkstraNodes.get(neighbour.getId());
-                if (next.getDroga() > temp.getDroga() + neighbour.getDistanceTo()) {
-                    next.setDroga(temp.getDroga() + neighbour.getDistanceTo());
+                if (next.getTotalDistance() > temp.getTotalDistance() + neighbour.getDistanceTo()) {
+                    next.setTotalDistance(temp.getTotalDistance() + neighbour.getDistanceTo());
 
-                    update_kol(queue, neighbour.getId(), next.getDroga());
+                    update_kol(queue, neighbour.getId(), next.getTotalDistance());
                     next.setPrevious(temp.getId());
                 }
             }
@@ -56,7 +62,7 @@ public class Dijkstra {
         return queueElement;
     }
 
-    ArrayList<Long>  showPath(Map<Long, DijkstraNode> dijkstraNodes, Long bw) {
+    ArrayList<Long> showPath(Map<Long, DijkstraNode> dijkstraNodes, Long bw) {
         DijkstraNode dijkstraNode = dijkstraNodes.get(bw);
 
         ArrayList<Long> pathIds = new ArrayList<>(50);
@@ -66,13 +72,6 @@ public class Dijkstra {
             dijkstraNode = dijkstraNodes.get(dijkstraNode.getPrevious());
         }
         return pathIds;
-//        ArrayList<CordNode> path = new ArrayList<>(pathIds.size());
-//
-//        for (int i = pathIds.size() - 1; i >= 0; i--) {
-//            CordNode tn = documentRepository.getCordNode(pathIds.get(i));
-//            path.add(tn);
-//        }
-//        return path;
     }
 
     void update_kol(LinkedList<QueueElement> queue, Long id, int droga) {
@@ -106,6 +105,32 @@ public class Dijkstra {
 
     public Integer getDistance(Map<Long, DijkstraNode> dijkstraNodes, Long bw) {
         DijkstraNode dijkstraNode = dijkstraNodes.get(bw);
-        return dijkstraNode.getDroga();
+        return dijkstraNode.getTotalDistance();
+    }
+
+    public Long findBestParking(ArrayList<CordNode> cordNodes, List<AbstractEntity> parkings,Map<Long, DijkstraNode> dijkstraNodes) {
+        float bestParkingScore = 200000000;
+        Parking bestParking = null;
+        DijkstraNode closetToBest=null;
+        for (int i = 0; i < parkings.size(); i++) {
+            Parking parking = (Parking) parkings.get(i);
+            if (parking.getFreeSlots() < parking.getTotalSlots()) {
+                Long closestId = distanceUtils.getClosestToNode(parking.getLocalization().getLat(), parking.getLocalization().getLon(), cordNodes,parkings);
+                DijkstraNode findNode = dijkstraNodes.get(closestId);
+                float score = findNode.getTotalDistance();
+                //score *=cos tam;
+                if (score<bestParkingScore){
+                    closetToBest=findNode;
+                    bestParkingScore=score;
+                }
+            }
+
+        }
+        if (closetToBest != null) {
+            return closetToBest.getId();
+        } else {
+            return null;
+        }
+
     }
 }

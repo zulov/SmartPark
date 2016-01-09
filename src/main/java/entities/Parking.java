@@ -8,7 +8,7 @@ import java.io.Serializable;
 public class Parking    extends AbstractEntity{
     @OneToOne
     @JoinColumn(name="localization_id")
-    private Localization localization;
+    private CordNode localization;
 
     @Column(name="free_slots")
     private Long freeSlots;
@@ -16,6 +16,27 @@ public class Parking    extends AbstractEntity{
     @Column(name="total_slots")
     private Long totalSlots;
 
+    public CordNode getLocalization() {
+        return localization;
+    }
 
+    public void setLocalization(CordNode localization) {
+        this.localization = localization;
+    }
 
+    public Long getFreeSlots() {
+        return freeSlots;
+    }
+
+    public void setFreeSlots(Long freeSlots) {
+        this.freeSlots = freeSlots;
+    }
+
+    public Long getTotalSlots() {
+        return totalSlots;
+    }
+
+    public void setTotalSlots(Long totalSlots) {
+        this.totalSlots = totalSlots;
+    }
 }

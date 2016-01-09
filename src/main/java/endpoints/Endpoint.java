@@ -28,8 +28,18 @@ public class Endpoint {
     @Path("find")
     @Consumes("application/json")
     @Produces("application/json")
-    public Response add(Request request) throws IOException {
-        ResponseList rl = algorithm.find(request.getStartLat(), request.getStartLon(), request.getEndLat(), request.getEndLon(),request.getThreshold());
+    public Response findPath(Request request) throws IOException {
+        ResponseList rl = algorithm.find(request);
+
+        return Response.status(200).entity(rl).build();
+    }
+
+    @POST
+    @Path("findParking")
+    @Consumes("application/json")
+    @Produces("application/json")
+    public Response findParking(Request request) throws IOException {
+        ResponseList rl = algorithm.findParking(request);
 
         return Response.status(200).entity(rl).build();
     }

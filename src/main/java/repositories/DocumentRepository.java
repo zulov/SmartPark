@@ -38,7 +38,6 @@ public class DocumentRepository {
         return entities;
     }
     public CordNode getCordNode (Long id){
-
         Query query = em.createQuery("FROM CordNode d where d.cid=:id", CordNode.class);
         query.setParameter("id",id);
         long startTime = System.currentTimeMillis();
@@ -46,7 +45,6 @@ public class DocumentRepository {
         long endTime = System.currentTimeMillis();
         System.out.println(endTime-startTime);
         return entity;
-
     }
 
     public AbstractEntity get(String entityName, String field,String value) {

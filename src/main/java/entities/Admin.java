@@ -13,7 +13,7 @@ public class Admin    extends AbstractEntity{
     private Account account;
 
     @OneToMany
-    @JoinColumn(name="parking_ids")
+    @JoinColumn(name="admin_parking")
     private List<Parking> parkings;
 
 }

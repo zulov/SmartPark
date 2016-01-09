@@ -7,10 +7,6 @@ import java.io.Serializable;
 @Table(name = "parking_sensor")
 public class ParkingSensor  extends AbstractEntity {
 
-    @OneToOne
-    @JoinColumn(name="localization_id")
-    private Localization localization;
-
     @Column(name="occupation")
     private Boolean occupation;
 
