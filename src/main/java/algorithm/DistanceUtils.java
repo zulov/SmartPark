@@ -6,37 +6,36 @@ import entities.Parking;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class DistanceUtils {
 
     public DistanceUtils() {
 
     }
-    Long getClosestToNode(double lat, double lon,ArrayList<CordNode> cordNodes,List<AbstractEntity> parkings) {
+
+    public Long getClosestToNode(double lat, double lon, ArrayList<CordNode> cordNodes, Map<Long, Parking> parkings) {
         CordNode baseNode = new CordNode(1L, lat, lon);
+
 
         double min_odl = cordNodes.get(0).minus(baseNode);
         CordNode closest = cordNodes.get(0);
         for (CordNode cordNode : cordNodes) {
-            boolean flag=false;
-            for(AbstractEntity ab:parkings){
-                Parking parking = (Parking) ab;
-                if (parking.getLocalization().getCid()==cordNode.getCid()){
-                    flag=true; break;
-                }
+            if (parkings.containsKey(cordNode.getCid())) {
+                continue;
             }
-            if(flag){continue;}
+
             double temp_odl = cordNode.minus(baseNode);
             if (min_odl > temp_odl) {
                 closest = cordNode;
                 min_odl = temp_odl;
             }
         }
-        System.out.println(min_odl + "--");
+        //System.out.println(min_odl);
         return closest.getCid();
     }
 
-    Long getClosest(double lat, double lon,ArrayList<CordNode> cordNodes) {
+    public Long getClosest(double lat, double lon, ArrayList<CordNode> cordNodes, int threshold) {
         CordNode baseNode = new CordNode(1L, lat, lon);
 
         double min_odl = cordNodes.get(0).minus(baseNode);
@@ -48,14 +47,17 @@ public class DistanceUtils {
                 min_odl = temp_odl;
             }
         }
-        System.out.println(min_odl + "--");
+        //System.out.println(min_odl);
+        if (min_odl > threshold) {
+            return -1L;
+        }
         return closest.getCid();
     }
 
-    Long getClosest(String _Lat, String _Lon,ArrayList<CordNode> cordNodes) {
+    public Long getClosest(String _Lat, String _Lon, ArrayList<CordNode> cordNodes, int threshold) {
         double lat = Double.parseDouble(_Lat);
         double lon = Double.parseDouble(_Lon);
-        return getClosest(lat,lon,cordNodes);
+        return getClosest(lat, lon, cordNodes, threshold);
     }
 
 }

@@ -5,12 +5,11 @@ import java.io.Serializable;
 /**
  * Created by Tomek on 2015-12-15.
  */
-public class Request implements Serializable{
+public class FindRequest implements Serializable{
 
     private Long userId;
-    private double threshold;
-    private String startLat;
-    private String startLon;
+    private String lat;
+    private String lon;
     private String endLat;
     private String endLon;
 
@@ -18,32 +17,24 @@ public class Request implements Serializable{
         return userId;
     }
 
-    public double getThreshold() {
-        return threshold;
-    }
-
-    public void setThreshold(double threshold) {
-        this.threshold = threshold;
-    }
-
     public void setUserId(Long userId) {
         this.userId = userId;
     }
 
-    public String getStartLat() {
-        return startLat;
+    public String getLat() {
+        return lat;
     }
 
-    public void setStartLat(String startLat) {
-        this.startLat = startLat;
+    public void setLat(String lat) {
+        this.lat = lat;
     }
 
-    public String getStartLon() {
-        return startLon;
+    public String getLon() {
+        return lon;
     }
 
-    public void setStartLon(String startLon) {
-        this.startLon = startLon;
+    public void setLon(String lon) {
+        this.lon = lon;
     }
 
     public String getEndLat() {

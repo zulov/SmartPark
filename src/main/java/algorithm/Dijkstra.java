@@ -1,10 +1,8 @@
 package algorithm;
 
-import entities.AbstractEntity;
-import entities.CordNode;
-import entities.Parking;
-import entities.User;
+import entities.*;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -20,6 +18,7 @@ public class Dijkstra {
         return threshold;
     }
 
+    public Parking bestParking;
     public void setThreshold(Double threshold) {
         this.threshold = threshold;
     }
@@ -108,23 +107,22 @@ public class Dijkstra {
         return dijkstraNode.getTotalDistance();
     }
 
-    public Long findBestParking(ArrayList<CordNode> cordNodes, List<AbstractEntity> parkings,Map<Long, DijkstraNode> dijkstraNodes) {
+    public Long findBestParking(ArrayList<CordNode> cordNodes, Map<Long,Parking> parkings, Map<Long, DijkstraNode> dijkstraNodes, List<AbstractEntity> userParkingDatas) {
         float bestParkingScore = 200000000;
-        Parking bestParking = null;
+
         DijkstraNode closetToBest=null;
-        for (int i = 0; i < parkings.size(); i++) {
-            Parking parking = (Parking) parkings.get(i);
+        for (Parking parking: parkings.values()) {
             if (parking.getFreeSlots() < parking.getTotalSlots()) {
                 Long closestId = distanceUtils.getClosestToNode(parking.getLocalization().getLat(), parking.getLocalization().getLon(), cordNodes,parkings);
                 DijkstraNode findNode = dijkstraNodes.get(closestId);
                 float score = findNode.getTotalDistance();
-                //score *=cos tam;
+                score *=1/getModifier(parking,userParkingDatas);
                 if (score<bestParkingScore){
                     closetToBest=findNode;
                     bestParkingScore=score;
+                    bestParking=parking;
                 }
             }
-
         }
         if (closetToBest != null) {
             return closetToBest.getId();
@@ -132,5 +130,19 @@ public class Dijkstra {
             return null;
         }
 
+    }
+
+    private float getModifier(Parking parking, List<AbstractEntity> userParkingDatas) {
+        float counter=1;
+        java.util.Date date= new java.util.Date();
+        Timestamp currentTimestamp=new Timestamp(date.getTime());
+        for(AbstractEntity ab:userParkingDatas){
+            UserParkingData userParkingData=(UserParkingData)ab;
+            if(parking.getId()==userParkingData.getParking().getId()){
+                float diff=Math.abs((currentTimestamp.getTime()/(1000.f*60*60)%24)-(userParkingData.getParkTime().getTime()/(1000.f*60*60)%24));
+                counter+=1/diff;
+            }
+        }
+        return counter;
     }
 }

@@ -3,9 +3,11 @@ package algorithm;
 import entities.AbstractEntity;
 import entities.CordNode;
 import entities.Distances;
+import entities.Parking;
 import repositories.DocumentRepository;
-import request.Request;
-import response.ResponseList;
+import request.FindRequest;
+import response.FindListResponse;
+import response.Status;
 
 import javax.ejb.Singleton;
 
@@ -21,57 +23,63 @@ import java.util.stream.Collectors;
 @Singleton
 public class Algorithm {
     private final DistanceUtils distanceUtils = new DistanceUtils();
+    private final float threshold = 4000.0f;
     @Inject
     private DocumentRepository documentRepository;
     private Map<Long, DijkstraNode> dijkstraNodes;
     private ArrayList<CordNode> cordNodes;
     private List<AbstractEntity> distances;
     private List<AbstractEntity> parkings;
+    private Map<Long, Parking> mapParkings;
     private List<AbstractEntity> userParkingDatas;
-    private Dijkstra dijkstra;
+
 
     public Algorithm() {
-        dijkstraNodes = new HashMap<>(40000);
+        dijkstraNodes = new HashMap<>(100000);
     }
 
 
-    public ResponseList find(Request request) throws IOException {
+    public FindListResponse find(FindRequest request) throws IOException {
         long startTime = System.currentTimeMillis();
         initDataFromDB();
 
-        dijkstra = new Dijkstra();
-        Long start = distanceUtils.getClosest(request.getStartLat(), request.getStartLon(), cordNodes);
-        Long end = distanceUtils.getClosest(request.getEndLat(), request.getEndLon(), cordNodes);
+        Dijkstra dijkstra = new Dijkstra();
+        Long start = distanceUtils.getClosest(request.getLat(), request.getLon(), cordNodes, 1000);
+        Long end = distanceUtils.getClosest(request.getEndLat(), request.getEndLon(), cordNodes, 1000);
 
-        calculate(start, request.getThreshold());
+        calculate(dijkstra, start, threshold);
         List<CordNode> path = createPath(dijkstra.showPath(dijkstraNodes, end));
         Integer distance = dijkstra.getDistance(dijkstraNodes, end);
-        long endTime = System.currentTimeMillis();
-        ResponseList rl = new ResponseList();
-        rl.setEntities(path);
-        rl.setTime(endTime - startTime);
-        rl.setHits(path.size());
-        rl.setDistance(distance);
+
+        FindListResponse rl = new FindListResponse("", Status.SUCCESS, System.currentTimeMillis() - startTime, path.size(), distance, path);
         return rl;
     }
 
-    public ResponseList findParking(Request request) throws IOException {
+    public FindListResponse findParking(FindRequest request) throws IOException {
         long startTime = System.currentTimeMillis();
+
         initDataFromDB();
+        String userId = request.getUserId().toString();
+        userParkingDatas = documentRepository.getList("UserParkingData", "user", userId);
+        Dijkstra dijkstra = new Dijkstra();
+        Long start = distanceUtils.getClosest(request.getLat(), request.getLon(), cordNodes, 250);
+        if (start < 0) {
+            FindListResponse rl = new FindListResponse("Poza obszarem!", Status.ERROR, System.currentTimeMillis() - startTime, 0, -1, null);
+            return rl;
+        }
+        calculate(dijkstra, start, 4000.0);
 
-        dijkstra = new Dijkstra();
-        Long start = distanceUtils.getClosest(request.getStartLat(), request.getStartLon(), cordNodes);
+        Long end = dijkstra.findBestParking(cordNodes, mapParkings, dijkstraNodes, userParkingDatas);
 
-        calculate(start, request.getThreshold());
-        Long end = dijkstra.findBestParking(cordNodes, parkings, dijkstraNodes);
-        List<CordNode> path = createPath(dijkstra.showPath(dijkstraNodes, end));
+        ArrayList<Long> list = dijkstra.showPath(dijkstraNodes, end);
+        List<CordNode> path = createPath(list);
+        if (!path.isEmpty()) {
+            path.add(dijkstra.bestParking.getLocalization());
+        }
+
         Integer distance = dijkstra.getDistance(dijkstraNodes, end);
-        long endTime = System.currentTimeMillis();
-        ResponseList rl = new ResponseList();
-        rl.setEntities(path);
-        rl.setTime(endTime - startTime);
-        rl.setHits(path.size());
-        rl.setDistance(distance);
+        FindListResponse rl = new FindListResponse("", Status.SUCCESS, System.currentTimeMillis() - startTime, path.size(), distance, path);
+
         return rl;
     }
 
@@ -85,11 +93,16 @@ public class Algorithm {
         }
         if (parkings == null) {
             parkings = documentRepository.getAll("Parking");
+            mapParkings=new HashMap<>(200);
+            for(AbstractEntity ab:parkings){
+                Parking parking=(Parking) ab;
+                mapParkings.put(parking.getLocalization().getCid(),parking);
+            }
         }
-        userParkingDatas = documentRepository.getAll("UserParkingData");
+
     }
 
-    private void calculate(Long start, double threshold) throws IOException {
+    private void calculate(Dijkstra dijkstra, Long start, double threshold) throws IOException {
         prepareDikstraNodes();
         dijkstra.setThreshold(threshold);
         dijkstra.calculate(dijkstraNodes, start);

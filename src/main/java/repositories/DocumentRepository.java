@@ -6,7 +6,7 @@ package repositories;
 
 import entities.AbstractEntity;
 import entities.CordNode;
-import response.ResponseList;
+import entities.Parking;
 
 import javax.ejb.LocalBean;
 import javax.ejb.Stateful;
@@ -15,8 +15,6 @@ import javax.ejb.TransactionAttributeType;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
-import java.io.IOException;
-import java.util.Calendar;
 import java.util.List;
 
 
@@ -40,25 +38,38 @@ public class DocumentRepository {
     public CordNode getCordNode (Long id){
         Query query = em.createQuery("FROM CordNode d where d.cid=:id", CordNode.class);
         query.setParameter("id",id);
-        long startTime = System.currentTimeMillis();
         CordNode  entity=(CordNode) query.getSingleResult();
-        long endTime = System.currentTimeMillis();
-        System.out.println(endTime-startTime);
         return entity;
     }
 
     public AbstractEntity get(String entityName, String field,String value) {
         Query query = em.createQuery("FROM " + entityName + " d where d."+field+"="+value, AbstractEntity.class);
-
-        AbstractEntity  entity= (AbstractEntity) query.getSingleResult();
+        Object o=query.getSingleResult();
+        AbstractEntity  entity= (AbstractEntity) o;
 
         return entity;
     }
+
+    public List<AbstractEntity> getList(String entityName, String field,String value) {
+        Query query = em.createQuery("FROM " + entityName + " d where d."+field+"="+value, AbstractEntity.class);
+
+        List<AbstractEntity> entities = query.getResultList();
+
+        return entities;
+    }
+
     public List<CordNode> findIds(List<Long> ids) {
         Query query = em.createQuery("FROM CordNode d where d.cid in (:ids)");
         query.setParameter("ids",ids);
         List<CordNode> documents=query.getResultList();
 
         return documents;
+    }
+    public Parking getParking(Long id) {
+        Query query = em.createQuery("FROM Parking p where p.localization="+id, Parking.class);
+
+        Parking entity= (Parking) query.getSingleResult();
+
+        return entity;
     }
 }

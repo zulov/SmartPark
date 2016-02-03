@@ -6,7 +6,7 @@ import java.util.Currency;
 import java.util.List;
 
 @Entity
-@Table(name = "user")
+@Table(name = "users")
 public class User    extends AbstractEntity {
     @OneToOne
     @JoinColumn(name="account_id")

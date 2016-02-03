@@ -39,4 +39,17 @@ public class Parking    extends AbstractEntity{
     public void setTotalSlots(Long totalSlots) {
         this.totalSlots = totalSlots;
     }
+    public void incFreeSlot(){
+        if(freeSlots<totalSlots){
+            freeSlots++;
+        }
+    }
+
+    public void decFreeSlot(){
+        if(freeSlots>1){
+            freeSlots--;
+        }
+    }
+
+
 }
