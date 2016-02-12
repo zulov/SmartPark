@@ -1,0 +1,44 @@
+POST /find/parking
+{
+"userId":1,
+"lat":"50.0725",
+"lon":"19.9168"
+}
+
+{
+  "message":"",
+  "status":"SUCCESS",
+  "time":7582,
+  "hits":4,
+  "distance":193,
+  "cords":[
+    {
+      "id":2902,
+      "activity":true,
+      "cid":240912644,
+      "lat":50.0724483,
+      "lon":19.9176271
+    },
+    {
+      "id":36096,
+      "activity":true,
+      "cid":1093885443,
+      "lat":50.072928,
+      "lon":19.9157584
+    },
+    {
+      "id":2213,
+      "activity":true,
+      "cid":226828656,
+      "lat":50.0729743,
+      "lon":19.9155782
+    },
+    {
+      "id":37271,
+      "activity":true,
+      "cid":470618647,
+      "lat":50.0736545,
+      "lon":19.9157364
+    }
+  ]
+}

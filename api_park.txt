@@ -1,0 +1,13 @@
+POST /parking/park
+{
+"userId":1,
+"lat":"50.0725",
+"lon":"19.9168"
+}
+
+{
+  "message":"Parkowanie się nie powidło",
+  "status":"ERROR",
+  "time":0,
+  "parkId":null
+}

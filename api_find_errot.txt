@@ -1,0 +1,15 @@
+POST /find/parking
+{
+"userId":1,
+"lat":"50.0725",
+"lon":"119.9168"
+}
+
+{
+  "message":"Poza obszarem!",
+  "status":"ERROR",
+  "time":11,
+  "hits":0,
+  "distance":-1,
+  "cords":null
+}

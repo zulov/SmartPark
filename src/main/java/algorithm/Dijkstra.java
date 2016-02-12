@@ -11,7 +11,7 @@ import java.util.Map;
 
 public class Dijkstra {
     public Dijkstra() {
-        threshold = 5000.0;
+        threshold = 4000.0;
     }
 
     public Double getThreshold() {
@@ -41,7 +41,7 @@ public class Dijkstra {
                 if (next.getTotalDistance() > temp.getTotalDistance() + neighbour.getDistanceTo()) {
                     next.setTotalDistance(temp.getTotalDistance() + neighbour.getDistanceTo());
 
-                    update_kol(queue, neighbour.getId(), next.getTotalDistance());
+                    updateQueue(queue, neighbour.getId(), next.getTotalDistance());
                     next.setPrevious(temp.getId());
                 }
             }
@@ -73,7 +73,7 @@ public class Dijkstra {
         return pathIds;
     }
 
-    void update_kol(LinkedList<QueueElement> queue, Long id, int droga) {
+    private void updateQueue(LinkedList<QueueElement> queue, Long id, int droga) {
         LinkedList<QueueElement> temp_v = new LinkedList<>();
         boolean found = false;
         while (!queue.isEmpty() && queue.getLast().getWart() < droga) {
