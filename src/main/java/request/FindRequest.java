@@ -5,10 +5,11 @@ import java.io.Serializable;
 /**
  * Created by Tomek on 2015-12-15.
  */
-public class FindRequest implements Serializable{
+public class FindRequest implements Serializable {
 
     private Long userId;
     private String lat;
+    private String password;
     private String lon;
     private String endLat;
     private String endLon;
@@ -51,5 +52,13 @@ public class FindRequest implements Serializable{
 
     public void setEndLon(String endLon) {
         this.endLon = endLon;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 }

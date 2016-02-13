@@ -19,7 +19,7 @@ import java.util.List;
  */
 @Singleton
 public class ParkManager {
-    private final float threshold=2000.0f;
+    private final float threshold = 2000.0f;
     @Inject
     private DocumentRepository documentRepository;
     private final DistanceUtils distanceUtils = new DistanceUtils();
@@ -32,15 +32,14 @@ public class ParkManager {
         initDataFromDB();
         ParkResponse pr;
 
-        if(validateParkIn(request)){
-            pr = new ParkResponse("", Status.SUCCESS,System.currentTimeMillis() - startTime,0L);
-        }else{
-            pr = new ParkResponse("Parkowanie się nie powidło", Status.ERROR,System.currentTimeMillis() - startTime,null);
+        if (validateParkIn(request)) {
+            pr = new ParkResponse("", Status.SUCCESS, System.currentTimeMillis() - startTime, 0L);
+        } else {
+            pr = new ParkResponse("Parkowanie się nie powidło", Status.ERROR, System.currentTimeMillis() - startTime, null);
         }
 
         return pr;
     }
-
 
 
     public ParkResponse unpark(ParkRequest request) {
@@ -48,27 +47,31 @@ public class ParkManager {
         initDataFromDB();
         ParkResponse pr;
 
-        if(validateParkOut(request)){
-            pr = new ParkResponse("", Status.SUCCESS,System.currentTimeMillis() - startTime,0L);
-        }else{
-            pr = new ParkResponse("odparkowanie się nie powidło", Status.ERROR,System.currentTimeMillis() - startTime,null);
+        if (validateParkOut(request)) {
+            pr = new ParkResponse("", Status.SUCCESS, System.currentTimeMillis() - startTime, 0L);
+        } else {
+            pr = new ParkResponse("odparkowanie się nie powidło", Status.ERROR, System.currentTimeMillis() - startTime, null);
         }
         return pr;
     }
 
     private Boolean validateParkIn(ParkRequest request) {
-        Long parkingId=distanceUtils.getClosest(request.getLat(),request.getLon(),cordNodesParkings,80);
-        if (parkingId<0){return false;}
-        CordNode cn=cordNodesParkings.stream().filter(v->v.getCid().equals(parkingId)).findFirst().get();
-        Parking parking=documentRepository.getParking((long) cn.getId());
-        if (parking.getFreeSlots()<=0){return false;}
+        Long parkingId = distanceUtils.getClosest(request.getLat(), request.getLon(), cordNodesParkings, 80);
+        if (parkingId < 0) {
+            return false;
+        }
+        CordNode cn = cordNodesParkings.stream().filter(v -> v.getCid().equals(parkingId)).findFirst().get();
+        Parking parking = documentRepository.getParking((long) cn.getId());
+        if (parking.getFreeSlots() <= 0) {
+            return false;
+        }
         parking.decFreeSlot();
         UserParkingData userParkingData = new UserParkingData();
         userParkingData.setParking(parking);
-        java.util.Date date= new java.util.Date();
-        Timestamp currentTimestamp=new Timestamp(date.getTime());
+        java.util.Date date = new java.util.Date();
+        Timestamp currentTimestamp = new Timestamp(date.getTime());
         userParkingData.setParkTime(currentTimestamp);
-        User user = (User) documentRepository.get("User","id",request.getUserId().toString());
+        User user = (User) documentRepository.get("User", "id", request.getUserId().toString());
         userParkingData.setUser(user);
         documentRepository.save(userParkingData);
         documentRepository.save(parking);
@@ -76,10 +79,12 @@ public class ParkManager {
     }
 
     private Boolean validateParkOut(ParkRequest request) {
-        Long parkingId=distanceUtils.getClosest(request.getLat(),request.getLon(),cordNodesParkings,30);
-        if (parkingId<0){return false;}
-        CordNode cn=cordNodesParkings.stream().filter(v->v.getCid().equals(parkingId)).findFirst().get();
-        Parking parking=documentRepository.getParking((long) cn.getId());
+        Long parkingId = distanceUtils.getClosest(request.getLat(), request.getLon(), cordNodesParkings, 30);
+        if (parkingId < 0) {
+            return false;
+        }
+        CordNode cn = cordNodesParkings.stream().filter(v -> v.getCid().equals(parkingId)).findFirst().get();
+        Parking parking = documentRepository.getParking((long) cn.getId());
         parking.incFreeSlot();
         documentRepository.save(parking);
         return true;
@@ -89,8 +94,8 @@ public class ParkManager {
         if (parkings == null) {
             parkings = documentRepository.getAll("Parking");
             cordNodesParkings = new ArrayList<>(parkings.size());
-            for(AbstractEntity ab:parkings){
-                Parking parking=(Parking) ab;
+            for (AbstractEntity ab : parkings) {
+                Parking parking = (Parking) ab;
                 cordNodesParkings.add(parking.getLocalization());
             }
         }
@@ -99,18 +104,31 @@ public class ParkManager {
     public ParkListResponse getParkings(String _lat, String _lon) {
         long startTime = System.currentTimeMillis();
         initDataFromDB();
-        List<Parking> parkingsInRange=new ArrayList<>(20);
-        CordNode cordNode=new CordNode();
+        List<Parking> parkingsInRange = new ArrayList<>(20);
+        CordNode cordNode = new CordNode();
         cordNode.setLat(Double.parseDouble(_lat));
         cordNode.setLon(Double.parseDouble(_lon));
 
-        for(AbstractEntity ab:parkings){
-            Parking parking=(Parking)ab;
-            if(parking.getLocalization().minus(cordNode)<threshold){
+        for (AbstractEntity ab : parkings) {
+            Parking parking = (Parking) ab;
+            if (parking.getLocalization().minus(cordNode) < threshold) {
                 parkingsInRange.add(parking);
             }
         }
-        ParkListResponse prl= new ParkListResponse("",Status.SUCCESS,System.currentTimeMillis()-startTime,parkingsInRange.size(),parkingsInRange);
+        ParkListResponse prl = new ParkListResponse("", Status.SUCCESS, System.currentTimeMillis() - startTime, parkingsInRange.size(), parkingsInRange);
+        return prl;
+    }
+
+    public ParkListResponse getAllParkings() {
+        long startTime = System.currentTimeMillis();
+        initDataFromDB();
+        List<Parking> carparks = new ArrayList<>();
+        for (AbstractEntity ab : parkings) {
+            Parking parking = (Parking) ab;
+            carparks.add(parking);
+        }
+
+        ParkListResponse prl = new ParkListResponse("", Status.SUCCESS, System.currentTimeMillis() - startTime, carparks.size(), carparks);
         return prl;
     }
 }

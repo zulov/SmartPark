@@ -24,7 +24,6 @@ public class ParkEndpoint {
     @Produces("application/json")
     public Response getClosest(ParkRequest request) throws IOException {
         ParkListResponse plr = parkManager.getParkings(request.getLat(), request.getLon());
-
         return Response.status(200).entity(plr).build();
     }
 
@@ -47,4 +46,13 @@ public class ParkEndpoint {
 
         return Response.status(200).entity(rl).build();
     }
+
+    @GET
+    @Path("all")
+    @Produces("application/json")
+    public Response getAll() throws IOException {
+        ParkListResponse plr = parkManager.getAllParkings();
+        return Response.status(200).entity(plr).build();
+    }
+
 }
