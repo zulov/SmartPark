@@ -14,9 +14,8 @@ public class DistanceUtils {
 
     }
 
-    public Long getClosestToNode(double lat, double lon, ArrayList<CordNode> cordNodes, Map<Long, Parking> parkings) {
+    public Long getClosestToNode(double lat, double lon, ArrayList<CordNode> cordNodes, Map<Long, Parking> parkings, int threshold) {
         CordNode baseNode = new CordNode(1L, lat, lon);
-
 
         double min_odl = cordNodes.get(0).minus(baseNode);
         CordNode closest = cordNodes.get(0);
@@ -31,7 +30,9 @@ public class DistanceUtils {
                 min_odl = temp_odl;
             }
         }
-        //System.out.println(min_odl);
+        if (min_odl > threshold) {
+            return -1L;
+        }
         return closest.getCid();
     }
 

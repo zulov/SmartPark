@@ -113,7 +113,7 @@ public class Dijkstra {
         DijkstraNode closetToBest=null;
         for (Parking parking: parkings.values()) {
             if (parking.getFreeSlots() < parking.getTotalSlots()) {
-                Long closestId = distanceUtils.getClosestToNode(parking.getLocalization().getLat(), parking.getLocalization().getLon(), cordNodes,parkings);
+                Long closestId = distanceUtils.getClosestToNode(parking.getLocalization().getLat(), parking.getLocalization().getLon(), cordNodes,parkings,10000);
                 DijkstraNode findNode = dijkstraNodes.get(closestId);
                 float score = findNode.getTotalDistance();
                 score *=1/getModifier(parking,userParkingDatas);

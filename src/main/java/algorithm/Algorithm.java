@@ -53,7 +53,8 @@ public class Algorithm {
         initDataFromDB();
 
         Dijkstra dijkstra = new Dijkstra();
-        Long start = distanceUtils.getClosest(request.getLat(), request.getLon(), cordNodes, 250);
+        Long start = distanceUtils.getClosestToNode(Double.parseDouble(request.getLat()),
+                Double.parseDouble(request.getLon()), cordNodes, mapParkings, 250);
         if (start < 0) {
             FindListResponse rl = new FindListResponse("Poza obszarem!", Status.ERROR, System.currentTimeMillis() - startTime, 0, -1, null);
             return rl;
