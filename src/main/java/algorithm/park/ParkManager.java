@@ -33,14 +33,13 @@ public class ParkManager {
         ParkResponse pr;
 
         if(validateParkIn(request)){
-            pr = new ParkResponse("", Status.SUCCESS,System.currentTimeMillis() - startTime,0L);
+            pr = new ParkResponse("", Status.PARKIN,System.currentTimeMillis() - startTime,0L);
         }else{
             pr = new ParkResponse("Parkowanie się nie powidło", Status.ERROR,System.currentTimeMillis() - startTime,null);
         }
 
         return pr;
     }
-
 
 
     public ParkResponse unpark(ParkRequest request) {

@@ -1,40 +1,24 @@
 package request;
 
+import entities.Parking;
+
 import java.io.Serializable;
 
 /**
  * Created by Tomek on 2015-12-15.
  */
-public class FindRequest implements Serializable{
+public class FindRequest extends ParkRequest implements Serializable {
 
-    private Long userId;
-    private String lat;
-    private String lon;
     private String endLat;
     private String endLon;
+    private String password;
 
-    public Long getUserId() {
-        return userId;
+    public String getPassword() {
+        return password;
     }
 
-    public void setUserId(Long userId) {
-        this.userId = userId;
-    }
-
-    public String getLat() {
-        return lat;
-    }
-
-    public void setLat(String lat) {
-        this.lat = lat;
-    }
-
-    public String getLon() {
-        return lon;
-    }
-
-    public void setLon(String lon) {
-        this.lon = lon;
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public String getEndLat() {

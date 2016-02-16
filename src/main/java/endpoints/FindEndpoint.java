@@ -2,9 +2,13 @@ package endpoints;
 
 
 import algorithm.Algorithm;
+import algorithm.SensorMock;
+import algorithm.park.ParkManager;
+import entities.CordNode;
 import repositories.DocumentRepository;
 import request.FindRequest;
 import response.FindListResponse;
+import response.ParkResponse;
 
 import javax.inject.Inject;
 import javax.ws.rs.*;
@@ -19,7 +23,10 @@ public class FindEndpoint {
     private DocumentRepository documentRepository;
     @Inject
     private Algorithm algorithm;
-
+    @Inject
+    private SensorMock sensorMock;
+    @Inject
+    private ParkManager parkManager;
 
     @POST
     @Path("find")
@@ -36,9 +43,15 @@ public class FindEndpoint {
     @Consumes("application/json")
     @Produces("application/json")
     public Response findParking(FindRequest request) throws IOException {
-        FindListResponse rl = algorithm.findParking(request);
+        if(sensorMock.ifPark(request.getUserId(),new CordNode(null,Double.parseDouble(request.getLat()),Double.parseDouble(request.getLon())))){
+            ParkResponse rl = parkManager.park(request);
+            return Response.status(200).entity(rl).build();
+        }else{
+            FindListResponse rl = algorithm.findParking(request);
+            return Response.status(200).entity(rl).build();
+        }
 
-        return Response.status(200).entity(rl).build();
+
     }
 
 
